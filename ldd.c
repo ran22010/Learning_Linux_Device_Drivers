@@ -2,17 +2,17 @@
 #include <linux/module.h>
 
 MODULE_LICENSE("GPL"); //*
-MODULE_AUTHOR("InPyjama - Piyush"); //!
+MODULE_AUTHOR("Raul"); //!
 MODULE_DESCRIPTION("Our first dynamically loadable module"); //!
 
-static int pyjama_module_init (void) {
-    printk("Hello, World! (from InPyjama!!)\n");
+static int first_module_init (void) {
+    printk("Hello, World! (from Raul!!)\n");
     return 0;
 }
 
-static void pyjama_module_exit (void) {
-    printk("Good, Bye! (form InPyjama!!)\n");
+static void first_module_exit (void) {
+    printk("Good, Bye! (from Raul!!)\n");
 }
 
-module_init(pyjama_module_init);
-module_exit(pyjama_module_exit);
+module_init(first_module_init);
+module_exit(first_module_exit);
