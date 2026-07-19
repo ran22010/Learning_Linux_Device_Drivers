@@ -2,13 +2,60 @@
 #include <linux/module.h>
 #include <linux/proc_fs.h>
 
+#define BUFFER_SIZE 1024
+
+static char kernel_buffer[BUFFER_SIZE];
+static size_t buffer_length = 0;
+
 MODULE_LICENSE("GPL"); //*
 MODULE_AUTHOR("Raul"); //!
 MODULE_DESCRIPTION("Our first dynamically loadable module"); //!
 
 static struct proc_dir_entry *custom_proc_node;
-struct proc_ops custom_proc_ops = {
 
+static ssize_t custom_read(struct file* file_pointer,
+                 char __user* user_space_buffer,
+                 size_t count, 
+                 loff_t* offset){
+    printk("custom_read: entry\n");
+
+    if (*offset >= buffer_length){
+        return 0;
+    }
+
+    if (copy_to_user(user_space_buffer, kernel_buffer, buffer_length)){
+        return -1;
+    }
+
+    *offset += buffer_length;
+
+    return buffer_length;
+};
+
+static ssize_t custom_write(struct file* file_pointer, 
+                 const char __user* user_space_buffer,
+                 size_t count,
+                 loff_t* offset){
+    printk("custom_write: entry\n");
+
+    size_t bytes_to_copy;
+    bytes_to_copy = min(count, (size_t)(BUFFER_SIZE - 1));
+    
+    if (copy_from_user(kernel_buffer, user_space_buffer, bytes_to_copy)){
+        return -1;
+    }
+
+    kernel_buffer[bytes_to_copy] = '\0';
+    buffer_length = bytes_to_copy;
+
+    printk("custom_write received: %s\n", kernel_buffer);
+
+    return bytes_to_copy;
+};
+
+struct proc_ops custom_proc_ops = {
+    .proc_read = custom_read,
+    .proc_write = custom_write
 };
 
 static int first_module_init (void) {
