@@ -62,7 +62,7 @@ static int first_module_init (void) {
     printk("first_module_init: entry\n");
 
     custom_proc_node = proc_create("ldd_driver",
-                                0666,
+                                0,
                                 NULL,
                                 &custom_proc_ops);
     
